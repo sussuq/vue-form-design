@@ -529,7 +529,7 @@
       {
         label: '表单标识',
         value: formData.value.name,
-        placeholder: '表单唯一标识，可为空',
+        placeholder: '表单唯一标识',
         key: 'name',
         hide: isSearch
       },
@@ -1496,10 +1496,10 @@
   const getDataSource = () => {
     // 获取数据源，表单设计才加载，搜索设置不需要
     if (!state.isSearch) {
-      getRequest('sourceList').then((res: any) => {
+      /*getRequest('sourceList').then((res: any) => {
         dataSourceOption.value = res.data.list
         //dataSourceOption.value.unshift({ name: '无', id: '' })
-      })
+      })*/
     }
   }
   // 表单属性修改

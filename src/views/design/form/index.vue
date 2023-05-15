@@ -66,9 +66,8 @@
   import AceDrawer from '../components/aceDrawer.vue'
   import { ref, reactive, provide, onMounted } from 'vue'
   import { useDesignFormStore } from '@/store/designForm'
-  import { getRequest } from '@/api'
   import { ElMessage } from 'element-plus'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRoute } from 'vue-router'
   import { afterResponse, beforeRequest, onChange } from '../utils'
   import {
     json2string,
@@ -83,7 +82,6 @@
   layoutStore.changeBreadcrumb([{ label: '系统工具' }, { label: '表单设计' }])
 
   const store = useDesignFormStore()
-  const router = useRouter()
   const route = useRoute().query || {}
   const state = reactive({
     formData: {
@@ -116,33 +114,33 @@
   const formControlAttrEl = ref()
   // 当前表单设计类型，供各子组件调用以展示不同页面，统一方式不需要每个组件都从路由中取
   provide('formDesignType', state.designType)
-  const getInitData = () => {
-    const id = route.id // 当前记录保存的id
-    if (id) {
-      // 获取初始表单数据
-      state.loading = true
-      getRequest('designById', { id: id })
-        .then((res) => {
-          const result = res.data
-          // 初始设计搜索时res.data=''
-          if (result.data) {
-            state.formData = stringToObj(result.data)
-          }
-          state.formDict = string2json(result.dict)
-          // 恢复表单名称
-          state.formOtherData.source = result.source
-          state.formOtherData.formName = result.name
-          if (result.source && state.designType !== 'search') {
-            // 加载属性侧边栏的字段标识，搜索时不需要请求
-            formControlAttrEl.value.getFormFieldBySource(result.source)
-          }
-          state.loading = false
-        })
-        .catch((res: any) => {
-          // console.log(res)
-          ElMessage.error(res.message || '加载异常')
-          state.loading = false
-        })
+
+  // 修改反显
+  const getInitData = (val: any) => {
+    const resData = stringToObj(val.formContent)
+    console.log('收到oa的数据：', resData)
+    // 获取初始表单数据
+    state.loading = true
+    try {
+      // 初始设计搜索时res.data=''
+      if (resData) {
+        state.formData = resData.formData
+      }
+      state.formDict = resData.formDict
+      // 恢复表单名称
+      state.formOtherData.source = resData.formOtherData.source
+      state.formOtherData.formName = resData.formOtherData.formName
+      if (resData.formOtherData.source && state.designType !== 'search') {
+        // 加载属性侧边栏的字段标识，搜索时不需要请求
+        formControlAttrEl.value.getFormFieldBySource(
+          resData.formOtherData.source
+        )
+      }
+      state.loading = false
+    } catch (err) {
+      ElMessage.error('加载异常')
+      console.error('表单数据加载异常', err)
+      state.loading = false
     }
   }
   const headToolClick = (type: string) => {
@@ -228,28 +226,22 @@
   }
   // 将数据保存在服务端
   const saveData = () => {
-    //　添加校验，没有选择数据源时则必须要配置接口url
-    const { addUrl, editUrl, requestUrl } = state.formData.config
-    if (
-      !state.formOtherData.source &&
-      (!addUrl || !editUrl || !requestUrl) &&
-      state.designType !== 'search'
-    ) {
-      ElMessage.error('请选择数据源或配置接口url地址，否则表单无法提交保存')
+    if (!state.formOtherData.formName) {
+      ElMessage.warning('表单名称不能为空')
+      return
+    }
+    if (!state.formData.form.name) {
+      ElMessage.warning('表单标识不能为空')
       return
     }
     let params: any = {
-      data: objToStringify(state.formData),
-      source: state.formOtherData.source, // 数据源允许在表单属性设置里修改的
-      name: state.formOtherData.formName, // 表单名称，用于在显示所有已创建的表单列表里显示
-      type: 1, // 1表单 2列表
-      dict: json2string(state.formDict)
-    }
-    let apiKey = 'designSave'
-    if (route.id) {
-      // 编辑状态 当前记录id
-      Object.assign(params, { id: route.id })
-      apiKey = 'designEdit'
+      formContent: objToStringify({
+        formData: state.formData,
+        formDict: state.formDict,
+        formOtherData: state.formOtherData
+      }),
+      formName: state.formOtherData.formName, // 表单名称，用于在显示所有已创建的表单列表里显示
+      formCode: state.formData.form.name // 表单唯一标识
     }
     // 列表搜索模式下只有修改
     if (state.designType === 'search') {
@@ -259,8 +251,8 @@
         id: route.id
       }
     }
-    state.loading = true
-    getRequest(apiKey, params)
+    window.parent.postMessage({ messageType: 'saveForm', data: params }, '*')
+    /*getRequest(apiKey, params)
       .then((res: any) => {
         ElMessage({
           message: res.message || '保存成功！',
@@ -284,7 +276,7 @@
       .catch((res: any) => {
         ElMessage.error(res.message || '保存异常')
         state.loading = false
-      })
+      })*/
     // 清空右侧内容管理菜单存在session的内容，刷新时可重新加载新菜单
     if (!route.id) {
       // 新增时
@@ -390,7 +382,19 @@
   const searchCheckField = (data: FormData) => {
     state.formData.list.push(data)
   }
-  getInitData()
+  window.addEventListener(
+    'message',
+    function (e) {
+      // 反显
+      getInitData(e.data)
+    },
+    false
+  )
+  // 告诉父组件iframe的加载状态
+  window.parent.postMessage(
+    { messageType: 'iframeLoadStatus', data: true },
+    '*'
+  )
   // 从数据源点创建表单过来时，带有参数source
   onMounted(() => {
     if (route.source) {

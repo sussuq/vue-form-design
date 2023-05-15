@@ -21,43 +21,6 @@ export const getRequest = (apiKey: string, data?: any, options: any = {}) => {
     },
     options
   )
-  // github演示时使用下面地址
-  if (window.location.host.indexOf('github') !== -1) {
-    let id = ''
-    if (url.indexOf('/id') !== -1 && data.id) {
-      id = data.id + ''
-    }
-    if (url.indexOf('/id') !== -1 && data.formId) {
-      id += data.formId
-    }
-    if (url.indexOf('design/list') !== -1 && data.type) {
-      id = data.type
-    }
-    if (url.indexOf('content/list') !== -1 && data.formId) {
-      id = data.formId
-    }
-    if (
-      url.includes('/save') ||
-      url.includes('/edit') ||
-      url.includes('/delete') ||
-      url.includes('/creat') ||
-      url.includes('/change') ||
-      url.includes('/single')
-    ) {
-      url = 'ok'
-    }
-    if (options.method) {
-      delete options.method
-    }
-    obj = Object.assign(
-      {
-        url: `./mock/${url}${id}.json`,
-        method: 'GET',
-        params: data
-      },
-      options
-    )
-  }
   return request(obj)
 }
 export const uploadUrl = '/api/' + allApi.upload

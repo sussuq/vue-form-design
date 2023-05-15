@@ -15,26 +15,26 @@ const routes = [
     path: '/design/dataScreen/show/:id',
     name: '/dataScreen',
     component: () => import('../views/design/dataScreen/show.vue')
-  },
-  {
-    path: '/layout',
-    redirect: '/',
-    name: 'layout',
-    component: () => import('../components/layout/index.vue'),
-    children: routesPage.filter((item: any) => {
-      return item.name.indexOf('docs') !== 0
-    })
-  },
-  {
-    path: '/docs',
-    redirect: '/docs',
-    name: 'docs',
-    component: () => import('../docs/components/layout.vue'),
-    children: routesPage.filter((item: any) => {
-      return item.name.indexOf('docs') === 0
-    })
   }
-]
+  // {
+  //   path: '/layout',
+  //   redirect: '/',
+  //   name: 'layout',
+  //   component: () => import('../components/layout/index.vue'),
+  //   children: routesPage.filter((item: any) => {
+  //     return item.name.indexOf('docs') !== 0
+  //   })
+  // },
+  // {
+  //   path: '/docs',
+  //   redirect: '/docs',
+  //   name: 'docs',
+  //   component: () => import('../docs/components/layout.vue'),
+  //   children: routesPage.filter((item: any) => {
+  //     return item.name.indexOf('docs') === 0
+  //   })
+  // }
+].concat(routesPage)
 // console.log(routes)
 // 配置路由
 const router = createRouter({
