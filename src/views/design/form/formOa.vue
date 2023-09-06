@@ -1,6 +1,6 @@
 <!-- Created by 337547038 -->
 <template>
-  <div v-loading='state.loading' style='min-height: 500px'>
+  <div v-loading='state.loading' style='min-height: 400px'>
     <ak-form
       ref='formEl'
       :formData='state.formData'
