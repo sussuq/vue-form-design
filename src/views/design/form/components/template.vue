@@ -12,15 +12,16 @@
         v-for="(item, index) in state.list"
         :key="index"
         @click="selectClick(item)"
-        ><img :src="item.imgPath" alt="" />{{ item.title }}</div
       >
+        <img :src="item.imgPath" alt="" />{{ item.title }}
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
   import { reactive } from 'vue'
-  import { FormData } from '../../types'
+  import type { FormData } from '@/types/form'
   const emits = defineEmits<{
     (e: 'click', value: FormData): void
   }>()
@@ -34,7 +35,7 @@
   }
   const init = () => {
     const template = import.meta.globEager('./template/*.ts')
-    console.log(template)
+    // console.log(template)
     state.list = []
     Object.keys(template).forEach((key: string) => {
       const file: any = template[key]

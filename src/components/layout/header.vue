@@ -4,12 +4,16 @@
     <Expand v-else />
   </el-icon>
   <el-breadcrumb separator="/" class="breadcrumb">
-    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+    <el-breadcrumb-item :to="{ path: '/' } as string">首页</el-breadcrumb-item>
     <template v-for="(item, index) in breadcrumb" :key="index">
-      <el-breadcrumb-item :to="{ path: item.path }" v-if="item.path">{{
-        item.label
+      <el-breadcrumb-item
+        :to="{ path: item.path } as string"
+        v-if="item.path"
+        >{{ item.label || item.name }}</el-breadcrumb-item
+      >
+      <el-breadcrumb-item v-else>{{
+        item.label || item.name
       }}</el-breadcrumb-item>
-      <el-breadcrumb-item v-else>{{ item.label }}</el-breadcrumb-item>
     </template>
   </el-breadcrumb>
   <div class="comm-header-tool">
@@ -35,20 +39,20 @@
         </el-icon>
       </div>
       <template #dropdown>
-        <el-menu class="avatar-menu">
-          <el-menu-item>
-            <el-icon><User /></el-icon>
+        <el-dropdown-menu>
+          <el-dropdown-item
+            ><el-icon><User /></el-icon>
             <span class="title">个人中心</span>
-          </el-menu-item>
-          <el-menu-item>
-            <el-icon><Setting /></el-icon>
+          </el-dropdown-item>
+          <el-dropdown-item
+            ><el-icon><Setting /></el-icon>
             <span class="title">设置</span>
-          </el-menu-item>
-          <el-menu-item @click="logout">
-            <el-icon><CircleClose /></el-icon>
+          </el-dropdown-item>
+          <el-dropdown-item @click="logout"
+            ><el-icon><CircleClose /></el-icon>
             <span class="title">退出登录</span>
-          </el-menu-item>
-        </el-menu>
+          </el-dropdown-item>
+        </el-dropdown-menu>
       </template>
     </el-dropdown>
   </div>
@@ -57,16 +61,15 @@
 <script setup lang="ts">
   import { computed, ref } from 'vue'
   import { useLayoutStore } from '@/store/layout'
-  //import { useStore } from 'vuex'
-  withDefaults(
-    defineProps<{
-      collapse: boolean
-    }>(),
-    {}
-  )
+  import { useRouter } from 'vue-router'
+
   const store = useLayoutStore()
+  const router = useRouter()
   const breadcrumb = computed(() => {
     return store?.breadcrumb
+  })
+  const collapse = computed(() => {
+    return store?.collapseMenu
   })
   const emits = defineEmits<{
     (e: 'click', type: string): void
@@ -76,10 +79,13 @@
     avatar: ''
   })
   const toolClick = (type: string) => {
+    if (type === 'collapse') {
+      store.setCollapseMenu(!collapse.value)
+    }
     emits('click', type)
   }
   const logout = () => {
-    console.log('logout')
+    store.logout(router)
   }
 </script>
 <style lang="scss">

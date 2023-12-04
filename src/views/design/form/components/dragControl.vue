@@ -9,19 +9,20 @@
           :key="item.name"
           @change="selectChange(item, $event)"
         >
-          {{ item.item?.label }}
+          {{ item.formItem?.label }}
         </el-checkbox>
       </div>
     </div>
     <div v-for="(list, index) in controlList" :key="index">
-      <div class="title"
-        >{{ list.title }}
+      <div class="title">
+        {{ list.title }}
         <div
           class="template"
           v-if="index === 0 && !isSearch"
           @click="useTemplateClick"
-          >使用模板</div
         >
+          使用模板
+        </div>
       </div>
       <draggable
         itemKey="key123"
@@ -51,11 +52,11 @@
   import controlListData from './controlList'
   import Draggable from 'vuedraggable-es'
   import { computed, ref, watch, inject } from 'vue'
-  import { FormData, FormList } from '../../types'
+  import { onBeforeRouteLeave } from 'vue-router'
+  import { FormData, FormList } from '@/types/form'
   import UseTemplate from './template.vue'
   import { getRequest } from '@/api'
-  import { stringToObj } from '@/utils/form'
-  import { jsonParseStringify } from '@/utils'
+  import { stringToObj, jsonParseStringify } from '@/utils/design'
 
   const props = withDefaults(
     defineProps<{
@@ -107,7 +108,7 @@
   const clone = (origin: any) => {
     return jsonParseStringify(origin)
   }
-  watch(
+  const unWatch = watch(
     () => props.formId,
     (val: number) => {
       if (val && isSearch.value) {
@@ -155,4 +156,7 @@
   const useTemplateSelect = (data: FormData) => {
     emits('click', data)
   }
+  onBeforeRouteLeave(() => {
+    unWatch() //销毁监听器
+  })
 </script>

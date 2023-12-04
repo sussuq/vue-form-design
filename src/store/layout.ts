@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { nextTick } from 'vue'
+import { removeStorage, getStorage, setStorage } from '@/utils'
 /*interface Breadcrumb {
   label: string
   to?: string
@@ -9,18 +10,14 @@ interface TabsViews {
   path: string
   name: string // 路由名称name
 }
-const getSession = window.sessionStorage.getItem('tagViews')
-let tabs: any = []
-if (getSession) {
-  tabs = JSON.parse(getSession)
-}
+const tabs = getStorage('tagViews')
 export const useLayoutStore = defineStore('layout', {
   state: () => {
     return {
       breadcrumb: [],
       tabs: tabs,
       reloadFlag: true, // 用于刷新路由
-      formMenu: [] // 使用工具创建的表单导航
+      collapseMenu: getStorage('collapseMenu', true) || false //左侧菜单展开收起状态
     }
   },
   // 也可以定义为
@@ -31,7 +28,7 @@ export const useLayoutStore = defineStore('layout', {
     },
     setTabsViews(obj: TabsViews[]) {
       this.tabs = obj
-      window.sessionStorage.setItem('tagViews', JSON.stringify(obj))
+      setStorage('tagViews', obj)
     },
     setReloadRouter() {
       this.reloadFlag = false
@@ -39,8 +36,24 @@ export const useLayoutStore = defineStore('layout', {
         this.reloadFlag = true
       })
     },
-    updateFormMenu(obj: any) {
-      this.formMenu = obj
+    setCollapseMenu(status: boolean): void {
+      this.collapseMenu = status
+      setStorage('collapseMenu', status, 0)
+    },
+    logout(router?: any) {
+      // 退出登录，清空登录相关信息
+      removeStorage('resources', true)
+      removeStorage('formMenuList', true)
+      removeStorage('refreshToken', true)
+      removeStorage('token', true)
+      if (router) {
+        router.push({ path: '/login' })
+      }
+    },
+    // 保存登录的信息
+    setLoginInfo(data: { [key: string]: string }) {
+      setStorage('token', data.token, 24)
+      setStorage('refreshToken', data.refreshToken, 48)
     }
   }
 })

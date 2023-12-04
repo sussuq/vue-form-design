@@ -21,7 +21,7 @@
       </draggable>
     </div>
     <div class="main-body">
-      <headTools @click="headToolClick" type="2" />
+      <head-tools @click="headToolClick" type="2" />
       <div class="main-form design-form">
         <echarts
           :type="1"
@@ -88,7 +88,7 @@
       v-model="state.visible"
       size="60%"
       :direction="state.direction"
-      custom-class="ace-dialog"
+      class="ace-dialog"
       :append-to-body="true"
       :before-close="drawerBeforeClose"
     >
@@ -105,7 +105,9 @@
     <VueFile ref="vueFileEl" />
   </div>
 </template>
-
+<route>
+{meta:{permissions:'none'}}
+</route>
 <script setup lang="ts">
   import echarts from './components/echarts.vue'
   import HeadTools from '../components/headTools.vue'
@@ -113,11 +115,15 @@
   import { reactive, ref, nextTick, onUnmounted, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import VueFile from '../components/vueFile.vue'
-  import { aceEdit, afterResponse, beforeRequest } from '../utils'
+  import {
+    aceEdit,
+    afterResponse,
+    beforeRequest,
+    objToStringify,
+    stringToObj
+  } from '@/utils/design'
   import { ElMessage } from 'element-plus'
   import Draggable from 'vuedraggable-es'
-
-  import { objToStringify, stringToObj } from '@/utils/form'
 
   const router = useRouter()
   const route = useRoute()
@@ -315,13 +321,13 @@
     if (state.id) {
       state.loading = true
       getRequest('echartsList', { id: state.id })
-        .then((res) => {
+        .then(res => {
           state.loading = false
           const result = res.data
           state.name = result.name
           echartsEl.value.setDataList(result.list)
         })
-        .catch((res) => {
+        .catch(res => {
           ElMessage.error(res.data?.message || '操作异常')
           state.loading = false
         })

@@ -6,18 +6,81 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "7336951",
+      "name": "刷新",
+      "font_class": "refresh",
+      "unicode": "e651",
+      "unicode_decimal": 58961
+    },
+    {
+      "icon_id": "1433820",
+      "name": "play",
+      "font_class": "play",
+      "unicode": "e65c",
+      "unicode_decimal": 58972
+    },
+    {
+      "icon_id": "21151020",
+      "name": "暂停",
+      "font_class": "pause",
+      "unicode": "e65a",
+      "unicode_decimal": 58970
+    },
+    {
+      "icon_id": "2423300",
+      "name": "无数据",
+      "font_class": "empty",
+      "unicode": "e642",
+      "unicode_decimal": 58946
+    },
+    {
+      "icon_id": "25964407",
+      "name": "编辑",
+      "font_class": "edit",
+      "unicode": "e65d",
+      "unicode_decimal": 58973
+    },
+    {
+      "icon_id": "34092245",
+      "name": "文件夹",
+      "font_class": "folder",
+      "unicode": "100ff",
+      "unicode_decimal": 65791
+    },
+    {
+      "icon_id": "28550192",
+      "name": "上传",
+      "font_class": "upload",
+      "unicode": "e682",
+      "unicode_decimal": 59010
+    },
+    {
+      "icon_id": "13644674",
+      "name": "箭头",
+      "font_class": "mouse",
+      "unicode": "e60b",
+      "unicode_decimal": 58891
+    },
+    {
+      "icon_id": "18372381",
+      "name": "手，手势",
+      "font_class": "hand",
+      "unicode": "e6cf",
+      "unicode_decimal": 59087
+    },
+    {
+      "icon_id": "7577422",
+      "name": "24gl-unlock4",
+      "font_class": "lock-open",
+      "unicode": "e9d6",
+      "unicode_decimal": 59862
+    },
+    {
       "icon_id": "658044",
       "name": "解锁",
       "font_class": "lock",
       "unicode": "e669",
       "unicode_decimal": 58985
-    },
-    {
-      "icon_id": "679775",
-      "name": "锁定",
-      "font_class": "lock-open",
-      "unicode": "e6e6",
-      "unicode_decimal": 59110
     },
     {
       "icon_id": "5388071",

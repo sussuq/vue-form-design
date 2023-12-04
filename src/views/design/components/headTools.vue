@@ -1,6 +1,7 @@
-<!-- Created by 337547038 -->
+<!-- Created by weiXin:337547038 -->
 <template>
   <div class="main-tools">
+    <slot></slot>
     <el-button
       link
       type="primary"
@@ -14,7 +15,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, computed } from 'vue'
+  import { computed } from 'vue'
+
   const props = withDefaults(
     defineProps<{
       showKey?: string[] // showKey,hideKey设置其中一个即可，showKey优先

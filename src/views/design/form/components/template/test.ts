@@ -1,6 +1,6 @@
 import logo from './test.png'
 export const imgPath = logo
-export const title = '演示test'
+export const title: string = '演示test'
 export const formData = {
   list: [
     {
@@ -10,12 +10,13 @@ export const formData = {
       },
       config: {},
       name: 'input1663920706618',
-      item: {
+      formItem: {
         label: '单行文本'
       }
     }
   ],
   form: {
     size: 'default'
-  }
+  },
+  config: {}
 }

@@ -2,18 +2,14 @@
   <el-dialog
     v-model="visible"
     title="导出vue文件"
-    custom-class="export-dialog"
+    class="export-dialog"
     width="80%"
   >
     <div id="editJsonCopy"></div>
     <template #footer>
       <div class="dialog-footer">
-        <el-button size="small" type="primary" @click="copyData">
-          复制数据
-        </el-button>
-        <el-button type="primary" size="small" @click="dialogExport">
-          导出代码
-        </el-button>
+        <el-button type="primary" @click="copyData"> 复制数据 </el-button>
+        <el-button type="primary" @click="dialogExport"> 导出代码 </el-button>
       </div>
     </template>
   </el-dialog>
@@ -23,15 +19,14 @@
   import { ref, nextTick } from 'vue'
   import Clipboard from 'clipboard'
   import { ElMessage } from 'element-plus'
-  import { aceEdit } from '../utils'
-  import { objToStringify } from '@/utils/form'
+  import { aceEdit, objToStringify } from '@/utils/design'
 
   const visible = ref(false)
   const editor = ref()
   // 根据生成的json提取需要导入的组件，远程方法，检验方法
   const getObjHtml = (obj: any) => {
     let rulesMethods = ''
-    let sourceFun = ''
+    const sourceFun = ''
     obj &&
       obj.list.forEach((item: any) => {
         if (item.customRules?.length) {
@@ -51,14 +46,14 @@
             }
           })
         }
-        /*if (item.config?.optionsType === 2 && item.config?.optionsFun) {
-      // 单选多选下拉等方法设值
-      // const optionsValue = ref([{label: "选项1", value: '1'}])
-      // provide("getCheckbox", optionsValue)
-      sourceFun += `// todo ${item.item.label}设置选项值\n`
-      sourceFun += `　const ${item.name}Option = ref([{label: "选项1", value: '1'}])\n`
-      sourceFun += `　provide("${item.config.optionsFun}", ${item.name}Option)\n`
-    }*/
+        // if (item.config?.optionsType === 2 && item.config?.optionsFun) {
+        //   // 单选多选下拉等方法设值
+        //   // const optionsValue = ref([{label: "选项1", value: '1'}])
+        //   // provide("getCheckbox", optionsValue)
+        //   sourceFun += `// todo ${item.item.label}设置选项值\n`
+        //   sourceFun += `const ${item.name}Option = ref([{label: "选项1", value: '1'}])\n`
+        //   sourceFun += `provide("${item.config.optionsFun}", ${item.name}Option)\n`
+        // }
       })
     return {
       rulesMethods: rulesMethods,
@@ -68,7 +63,7 @@
   const open = (obj: any) => {
     visible.value = true
     const getHtml = getObjHtml(obj)
-    const { addUrl, editUrl, requestUrl } = obj.config
+    const { submitUrl = '', editUrl = '', requestUrl = '' } = obj.config
     if (requestUrl) {
       // 从obj里删除使用props方式
       delete obj.config.requestUrl
@@ -77,9 +72,9 @@
       // 从obj里删除使用props方式
       delete obj.config.editUrl
     }
-    if (addUrl) {
+    if (submitUrl) {
       // 从obj里删除使用props方式
-      delete obj.config.addUrl
+      delete obj.config.submitUrl
     }
 
     const html = `<template>
@@ -87,11 +82,11 @@
     <ak-form
       ref="formNameEl"
       :type="formType"
-      :formData="formData"
-      requestUrl="${requestUrl}"
-      addUrl="${addUrl}"
-      editUrl="${editUrl}"
-      :beforeSubmit="beforeSubmit">
+      :data="formData"
+      request-url="${requestUrl}"
+      submit-url="${submitUrl}"
+      edit-url="${editUrl}"
+      :before-submit="beforeSubmit">
     </ak-form>
   </div>
 </template>
@@ -99,7 +94,7 @@
   import { ref, computed, provide } from 'vue'
   const formNameEl = ref()
   const formData = ref(${objToStringify(obj)})
-    // todo 存在编辑时，可根据路由等参数设置当前表单模式　1新增　2编辑
+    // todo 存在编辑时，可根据路由等参数设置当前表单模式 1新增 2编辑
   const formType = computed(() => {
      return 1
   })
@@ -107,7 +102,7 @@
   ${getHtml.sourceFun}
   // 表单提交时参数处理
   const beforeSubmit = (params)=>{
-    //　如编辑时添加参数
+    // 如编辑时添加参数
     //  params.id='xxx'
     return params
   }
@@ -121,12 +116,12 @@
   const openTable = (obj: any) => {
     const openDialog = obj.config?.openType === 'dialog'
     const dialogWidth = obj.config?.dialogWidth || '600px'
-    const requestUrl = obj.config?.requestUrl
+    const requestUrl = obj.config?.requestUrl || ''
     if (requestUrl) {
       // 从obj里删除使用props方式
       delete obj.config.requestUrl
     }
-    const deleteUrl = obj.config?.deleteUrl
+    const deleteUrl = obj.config?.deleteUrl || ''
     if (deleteUrl) {
       // 从obj里删除使用props方式
       delete obj.config.deleteUrl
@@ -149,10 +144,10 @@
         :dict="dialog.dict"
         :type="dialog.formType"
         requestUrl=""
-        addUrl=""
-        editUrl=""
-        :beforeSubmit="beforeSubmit"
-        :afterSubmit="afterSubmit"
+        submit-url=""
+        edit-url=""
+        :before-submit="beforeSubmit"
+        :after-submit="afterSubmit"
         @btn-click="dialogBtnClick"
       ></ak-form>
     </el-dialog>`
@@ -184,24 +179,27 @@
       // 编辑，根据id加载
       if (btn.key === 'edit') {
         nextTick(() => {
+       // eslint-disable-next-line no-irregular-whitespace
        　 // todo 当表单内容字段比较少，所需值从列表数据就可以获取
+       // eslint-disable-next-line no-irregular-whitespace
+       // eslint-disable-next-line no-irregular-whitespace
        　　// formEl.value.setValue(row)
           formEl.value.getData({ id: row.id })
         })
       }
     }
   }
-  //　提交表单前事件
+  // 提交表单前事件
   const beforeSubmit = (params) => {
     if(dialog.formType===2){ // 编辑模式下添加参数
       params.id = dialog.editId
     }
     return params
   }
-  //　提交表单后事件
+  // 提交表单后事件
   const afterSubmit = (type) => {
     if (type === 'success') {
-      //　添加成功，刷新列表数据
+      // 添加成功，刷新列表数据
       closeResetDialog()
       tableListEl.value.getListData()
     }
@@ -218,17 +216,17 @@
       closeResetDialog()
     }
   }
-  `
+`
     }
     visible.value = true
     const html = `<template>
   <div>
     <ak-list
       ref="tableListEl"
-      requestUrl="${requestUrl}"
-      deleteUrl="${deleteUrl}"
-      :searchData="searchData"
-      :tableData="tableData"
+      request-url="${requestUrl}"
+      delete-url="${deleteUrl}"
+      :search-data="searchData"
+      :data="tableData"
       ${listBtn}>
     </ak-list>
     ${formHtml}
@@ -252,11 +250,23 @@
   const openScreen = (obj: any) => {
     visible.value = true
     let styleCss = ''
+    let globalData = ''
+    let globalImport = ''
     const style = obj.config.style
     if (style) {
-      styleCss = `<style>
-${style}
+      styleCss = `<style>${style}
 <\/style>`
+    }
+    if (obj.config.requestUrl) {
+      // 全局大屏数据
+      globalImport = `import { getGlobalData } from '@/views/design/screen/getData'`
+      globalData = `const globalScreen = ref({})
+  provide('globalScreen', globalScreen)
+  const {requestUrl, afterResponse, beforeRequest, method} = screenData.value.config
+  getGlobalData({requestUrl, afterResponse, beforeRequest, method})
+  .then((res: any) => {
+       globalScreen.value = res
+   })`
     }
     const html = `<template>
   <div :style="screenStyle" class="design-canvas">
@@ -269,7 +279,8 @@ ${style}
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
+  import { ref, computed, provide } from 'vue'
+  ${globalImport}
   const loading = ref(true)
   const screenData = ref(${objToStringify(obj)})
   const screenStyle = computed(() => {
@@ -282,6 +293,7 @@ ${style}
       position: 'relative'
     }
   })
+  ${globalData}
 <\/script>
 ${styleCss}`
     nextTick(() => {

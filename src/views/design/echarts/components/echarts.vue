@@ -50,7 +50,7 @@
 <script setup lang="ts">
   import { ref, watch } from 'vue'
   import Draggable from 'vuedraggable-es'
-  import EchartsInt from './echartsInt.vue'
+  import EchartsInt from '../../components/echartsInt.vue'
 
   const props = withDefaults(
     defineProps<{
@@ -127,6 +127,8 @@
     dataList.value = obj
   }
   // 设备图标数据
-  const setData = (data: any) => {}
+  const setData = (data: any) => {
+    console.log(data)
+  }
   defineExpose({ getData, setDataList, setData })
 </script>
